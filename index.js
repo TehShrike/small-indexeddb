@@ -20,46 +20,57 @@ module.exports = function getDatabaseStore(databaseName, storeName) {
 
 const dbStore = (db, storeName) => ({
 	read(keys) {
-		return new Promise((resolve, reject) => {
-			const transaction = db.transaction(storeName, `readonly`)
-			const store = transaction.objectStore(storeName)
+		assert(Array.isArray(keys), 'Must pass an array to "read"')
+		const transactionType = `readonly`
 
-			const resultsPromise = pMap(keys, key => new Promise((resolve, reject) => {
-				const request = store.get(key)
-
-				request.onerror = () => reject(request.error)
-				request.onsuccess = () => {
-					resolve(request.result)
-				}
-			}))
-
-			transaction.onerror = () => reject(transaction.error)
-			transaction.oncomplete = () => resolve(resultsPromise)
-		})
+		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
+			pMap(keys, key =>
+				promisifyRequest(store, store => store.get(key))
+			)
+		)
 	},
 	write(keyValuePairs) {
+		assert(Array.isArray(keyValuePairs), 'Must pass an array to "write"')
 		const sanitizedKeyValuePairs = keyValuePairs.map(makeKeyValue)
+		const transactionType = `readwrite`
 
-		return new Promise((resolve, reject) => {
-			const transaction = db.transaction(storeName, `readwrite`)
-			const store = transaction.objectStore(storeName)
-
-			const resultsPromise = pMap(sanitizedKeyValuePairs, ({ key, value }) =>
-				new Promise((resolve, reject) => {
-					const request = store.put(value, key)
-
-					request.onerror = () => reject(request.error)
-					request.onsuccess = resolve
-				})
+		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
+			pMap(sanitizedKeyValuePairs, ({ key, value }) =>
+				promisifyRequest(store, store => store.put(value, key))
 			)
+		)
+	},
+	delete(keys) {
+		assert(Array.isArray(keys), 'Must pass an array to "delete"')
+		const transactionType = `readwrite`
 
-			transaction.onerror = () => reject(transaction.error)
-			transaction.oncomplete = () => {
-				resultsPromise.then(resolve, reject)
-			}
-		})
+		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
+			pMap(keys, key =>
+				promisifyRequest(store, store => store.delete(key))
+			)
+		)
 	},
 })
+
+function runQueriesInTransaction({ db, storeName, transactionType }, fn) {
+	return new Promise((resolve, reject) => {
+		const transaction = db.transaction(storeName, transactionType)
+		const store = transaction.objectStore(storeName)
+
+		const resultsPromise = fn(store)
+
+		transaction.onerror = () => reject(transaction.error)
+		transaction.oncomplete = () => resolve(resultsPromise)
+	})
+}
+
+function promisifyRequest(store, fn) {
+	return new Promise((resolve, reject) => {
+		const request = fn(store)
+		request.onerror = () => reject(request.error)
+		request.onsuccess = () => resolve(request.result)
+	})
+}
 
 function makeKeyValue(pair) {
 	if (Array.isArray(pair)) {
