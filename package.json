@@ -1,0 +1,31 @@
+{
+  "name": "small-indexeddb",
+  "version": "1.0.0",
+  "description": "Transactional key/value interactions with IndexedDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "rollup -c | tape-run"
+  },
+  "keywords": [
+    "indexeddb",
+    "indexedb",
+    "idb",
+    "browser",
+    "transaction"
+  ],
+  "author": "TehShrike",
+  "license": "WTFPL",
+  "devDependencies": {
+    "rollup": "^0.52.1",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.1.0",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "tape": "^4.8.0",
+    "tape-promise": "^2.0.1",
+    "tape-run": "^3.0.1"
+  },
+  "dependencies": {
+    "p-map": "^1.2.0"
+  }
+}
