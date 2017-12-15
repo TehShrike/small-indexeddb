@@ -25,5 +25,7 @@
     "tape-promise": "^2.0.1",
     "tape-run": "^3.0.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "p-defer": "^1.0.0"
+  }
 }

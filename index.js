@@ -1,4 +1,4 @@
-const defer = require('./defer.js')
+const defer = require('p-defer')
 
 const version = 1
 const storeName = 'small-indexeddb'
