@@ -43,3 +43,17 @@ test('Write some values, delete one, then read them', async t => {
 	t.equal(value2, undefined)
 	t.equal(value3, 'value3')
 })
+
+test(`Write some values, then clear 'em out`, async t => {
+	const store = await smallIndexedDb('whatever', 'someStore')
+
+	await store.write([
+		[ 'key1', 'value1' ],
+	])
+
+	await store.clear()
+
+	const [ value1 ] = await store.read([ 'key1' ])
+
+	t.equal(value1, undefined)
+})

@@ -50,6 +50,13 @@ const dbStore = (db, storeName) => ({
 			)
 		)
 	},
+	clear() {
+		const transactionType = `readwrite`
+
+		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
+			promisifyRequest(store, store => store.clear())
+		)
+	},
 })
 
 function runQueriesInTransaction({ db, storeName, transactionType }, fn) {

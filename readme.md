@@ -54,6 +54,18 @@ store.write([
 })
 ```
 
+## `promise = store.delete(keysArray)`
+
+Delete any number of keys from the store.
+
+```js
+store.delete([ 'key1', 'key2' ])
+```
+
+## `promise = store.clear()`
+
+Wipe the store.
+
 # In the future maybe
 
 - interact with schema versions?
