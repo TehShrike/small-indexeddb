@@ -1,6 +1,6 @@
 {
   "name": "small-indexeddb",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Transactional key/value interactions with IndexedDB",
   "main": "index.js",
   "scripts": {
