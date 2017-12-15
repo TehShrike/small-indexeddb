@@ -25,7 +25,5 @@
     "tape-promise": "^2.0.1",
     "tape-run": "^3.0.1"
   },
-  "dependencies": {
-    "p-map": "^1.2.0"
-  }
+  "dependencies": {}
 }

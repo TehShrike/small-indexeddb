@@ -1,4 +1,4 @@
-const pMap = require('p-map')
+const defer = require('./defer.js')
 
 const version = 1
 const storeName = 'small-indexeddb'
@@ -26,9 +26,7 @@ const dbStore = (db, storeName) => ({
 		const transactionType = `readonly`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
-			pMap(keys, key =>
-				promisifyRequest(store, store => store.get(key))
-			)
+			keys.map(key => promisifyRequest(store.get(key)))
 		)
 	},
 	write(keyValuePairs) {
@@ -37,9 +35,7 @@ const dbStore = (db, storeName) => ({
 		const transactionType = `readwrite`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
-			pMap(sanitizedKeyValuePairs, ({ key, value }) =>
-				promisifyRequest(store, store => store.put(value, key))
-			)
+			sanitizedKeyValuePairs.map(({ key, value }) => promisifyRequest(store.put(value, key)))
 		)
 	},
 	delete(keys) {
@@ -47,16 +43,14 @@ const dbStore = (db, storeName) => ({
 		const transactionType = `readwrite`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
-			pMap(keys, key =>
-				promisifyRequest(store, store => store.delete(key))
-			)
+			keys.map(key => promisifyRequest(store.delete(key)))
 		)
 	},
 	clear() {
 		const transactionType = `readwrite`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
-			promisifyRequest(store, store => store.clear())
+			promisifyRequest(store.clear())
 		)
 	},
 })
@@ -66,19 +60,24 @@ function runQueriesInTransaction({ db, storeName, transactionType }, fn) {
 		const transaction = db.transaction(storeName, transactionType)
 		const store = transaction.objectStore(storeName)
 
-		const resultsPromise = fn(store)
+		const promises = fn(store)
+
+		const resultsPromise = Array.isArray(promises)
+			? Promise.all(promises)
+			: promises
 
 		transaction.onerror = () => reject(transaction.error)
 		transaction.oncomplete = () => resolve(resultsPromise)
 	})
 }
 
-function promisifyRequest(store, fn) {
-	return new Promise((resolve, reject) => {
-		const request = fn(store)
-		request.onerror = () => reject(request.error)
-		request.onsuccess = () => resolve(request.result)
-	})
+function promisifyRequest(request) {
+	const deferred = defer()
+
+	request.onerror = () => deferred.reject(request.error)
+	request.onsuccess = () => deferred.resolve(request.result)
+
+	return deferred.promise
 }
 
 function makeKeyValue(pair) {
