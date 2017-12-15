@@ -1,12 +1,12 @@
 # Goals
 
+- support key/value operations in bulk
+- promise-based API, avoiding events
+- expose multi-query transactions in a way that is easy to interact with and reason about
 - small, like [idb-keyval](https://github.com/jakearchibald/idb-keyval) and [nanodb](https://github.com/lrlna/nanoidb)
 - not large, like [localForage](https://github.com/localForage/localForage/blob/master/src/localforage.js) or [Dexie](https://github.com/dfahlander/Dexie.js/blob/master/src/Dexie.js) or [JsStore](https://github.com/ujjwalguptaofficial/JsStore/blob/master/Code/JsStore/JsStoreInstance.ts)
 - not tiny - no code golfing here, maintainability first
-- support reading and writing keys
-- promise-based API, avoiding events
 - tests
-- expose transactions in a way that is easy to interact with and reason about
 
 # IndexedDB model
 
@@ -14,17 +14,25 @@
 - Databases contain object stores, identified by a string name
 - Object stores can have transactions applied to them with any number of read/write/delete actions
 
-This library exposes the above ideas in a somewhat different way than the browser does, but I believe the core concepts hold.
+This library exposes the above ideas in a somewhat different way than the browser does, but I believe the concepts hold.
 
 # Notes
 
-This library uses ES2015 language features.  If you want to use it in older browsers, you will need to transpile to ES5 and/or polyfill Promise, IndexedDB, etc in your own build.
+This library uses ES2015 language features.  If you want to use it in older browsers, you will need to polyfill Promise, IndexedDB, etc and/or transpile to ES5 in your own build.
 
 # API
 
-## `storePromise = smallIndexedDb(databaseName, storeName)`
+## `storePromise = smallIndexedDb(databaseName)`
 
 Returns a promise that resolves to a store in the given database.  The store will be created if it does not exist yet.
+
+Under the hood, the store name will be the same as the database name.
+
+```js
+smallIndexedDb('myCoolDb').then(store => {
+	store.write({ key: 'aww', value: 'yeah' })
+})
+```
 
 ## `valuesPromise = store.read(keysArray)`
 
@@ -69,6 +77,7 @@ Wipe the store.
 # In the future maybe
 
 - interact with schema versions?
+- support running different kinds of queries in the same transaction?
 
 # License
 

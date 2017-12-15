@@ -1,7 +1,9 @@
 const pMap = require('p-map')
-const version = 1
 
-module.exports = function getDatabaseStore(databaseName, storeName) {
+const version = 1
+const storeName = 'small-indexeddb'
+
+module.exports = function getDatabaseStore(databaseName) {
 	return new Promise((resolve, reject) => {
 		const openRequest = window.indexedDB.open(databaseName, version)
 
