@@ -16,24 +16,23 @@
 
 This library exposes the above ideas in a somewhat different way than the browser does, but I believe the concepts hold.
 
-# Notes
-
-This library uses ES2015 language features.  If you want to use it in older browsers, you will need to polyfill Promise, IndexedDB, etc and/or transpile to ES5 in your own build.
-
 # API
 
 ```js
 import smallIndexedDb from 'small-indexeddb'
 ```
 
-## `storePromise = smallIndexedDb(databaseName)`
+## `promise = smallIndexedDb(databaseName)`
 
-Returns a promise that resolves to a store in the given database.  The store will be created if it does not exist yet.
+Returns a promise that resolves to a transaction-running function for the given database.  The store will be created if it does not exist yet.
 
 Under the hood, the store name will be the same as the database name.
 
 ```js
-smallIndexedDb('myCoolDb').then(store => {
+smallIndexedDb('myCoolDb').then(runTransaction => {
+	runTransaction(db => {
+
+	})
 	store.write({ key: 'aww', value: 'yeah' })
 })
 ```

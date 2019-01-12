@@ -1,16 +1,17 @@
 const test = require(`zora`)
 const smallIndexedDb = require(`./bundle.js`)
 
-test(`Read empty key`, t => smallIndexedDb(`dummyDb`, `dummyStore`).then(store =>
-	store.read([ `wat` ]).then(results => {
-		t.ok(Array.isArray(results))
-		t.equal(results.length, 1)
-		t.equal(results[0], undefined)
-	}))
-)
+test(`Read empty key`, t => smallIndexedDb(`dummyDb`, `dummyStore`).then(async transaction => {
+	const results = await transaction(store => [ store.get(`wat`) ])
+	t.ok(Array.isArray(results))
+	t.equal(results.length, 1)
+	t.equal(results[0], undefined)
+}))
 
 test(`Write values, then read them back`, async t => {
-	const store = await smallIndexedDb(`someStore1`)
+	const transaction = await smallIndexedDb(`someStore1`)
+
+	await transaction(store => )
 
 	await store.write([
 		[ `key1`, `value1` ],
