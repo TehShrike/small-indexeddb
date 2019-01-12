@@ -1,7 +1,7 @@
-const defer = require('p-defer')
+const defer = require(`p-defer`)
 
 const version = 1
-const storeName = 'small-indexeddb'
+const storeName = `small-indexeddb`
 
 module.exports = function getDatabaseStore(databaseName) {
 	return new Promise((resolve, reject) => {
@@ -10,7 +10,7 @@ module.exports = function getDatabaseStore(databaseName) {
 		openRequest.onupgradeneeded = () => {
 			openRequest.result.createObjectStore(storeName)
 		}
-		openRequest.onblocked = () => reject(new Error('onblocked'))
+		openRequest.onblocked = () => reject(new Error(`onblocked`))
 		openRequest.onerror = () => reject(openRequest.error)
 		openRequest.onsuccess = () => {
 			const db = openRequest.result
@@ -22,7 +22,7 @@ module.exports = function getDatabaseStore(databaseName) {
 
 const dbStore = (db, storeName) => ({
 	read(keys) {
-		assert(Array.isArray(keys), 'Must pass an array to "read"')
+		assert(Array.isArray(keys), `Must pass an array to "read"`)
 		const transactionType = `readonly`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
@@ -30,7 +30,7 @@ const dbStore = (db, storeName) => ({
 		)
 	},
 	write(keyValuePairs) {
-		assert(Array.isArray(keyValuePairs), 'Must pass an array to "write"')
+		assert(Array.isArray(keyValuePairs), `Must pass an array to "write"`)
 		const sanitizedKeyValuePairs = keyValuePairs.map(makeKeyValue)
 		const transactionType = `readwrite`
 
@@ -39,7 +39,7 @@ const dbStore = (db, storeName) => ({
 		)
 	},
 	delete(keys) {
-		assert(Array.isArray(keys), 'Must pass an array to "delete"')
+		assert(Array.isArray(keys), `Must pass an array to "delete"`)
 		const transactionType = `readwrite`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
@@ -82,15 +82,15 @@ function promisifyRequest(request) {
 
 function makeKeyValue(pair) {
 	if (Array.isArray(pair)) {
-		assert(pair.length === 2, 'key/value arrays must have exactly two elements')
+		assert(pair.length === 2, `key/value arrays must have exactly two elements`)
 
 		const [ key, value ] = pair
 		return { key, value }
 	} else {
-		assert(pair && typeof pair === 'object',
-			'"put" arguments must be an array or an object')
-		assert(hasProperty(pair, 'key') && hasProperty(pair, 'value'),
-			'key/value objects must have "key" and "value" properties')
+		assert(pair && typeof pair === `object`,
+			`"put" arguments must be an array or an object`)
+		assert(hasProperty(pair, `key`) && hasProperty(pair, `value`),
+			`key/value objects must have "key" and "value" properties`)
 
 		return pair
 	}
