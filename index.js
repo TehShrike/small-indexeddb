@@ -1,9 +1,9 @@
-const defer = require(`p-defer`)
+import defer from 'p-defer'
 
 const version = 1
 const storeName = `small-indexeddb`
 
-module.exports = function getDatabaseStore(databaseName) {
+export default function getDatabaseStore(databaseName) {
 	return new Promise((resolve, reject) => {
 		const openRequest = window.indexedDB.open(databaseName, version)
 
@@ -26,7 +26,7 @@ const dbStore = (db, storeName) => ({
 		const transactionType = `readonly`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
-			keys.map(key => promisifyRequest(store.get(key)))
+			keys.map(key => store.get(key))
 		)
 	},
 	write(keyValuePairs) {
@@ -35,7 +35,7 @@ const dbStore = (db, storeName) => ({
 		const transactionType = `readwrite`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
-			sanitizedKeyValuePairs.map(({ key, value }) => promisifyRequest(store.put(value, key)))
+			sanitizedKeyValuePairs.map(({ key, value }) => store.put(value, key))
 		)
 	},
 	delete(keys) {
@@ -43,15 +43,18 @@ const dbStore = (db, storeName) => ({
 		const transactionType = `readwrite`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
-			keys.map(key => promisifyRequest(store.delete(key)))
+			keys.map(key => store.delete(key))
 		)
 	},
 	clear() {
 		const transactionType = `readwrite`
 
 		return runQueriesInTransaction({ db, storeName, transactionType }, store =>
-			promisifyRequest(store.clear())
+			store.clear()
 		)
+	},
+	transaction(transactionType, fn) {
+		return runQueriesInTransaction({ db, storeName, transactionType }, fn)
 	},
 })
 
@@ -60,11 +63,11 @@ function runQueriesInTransaction({ db, storeName, transactionType }, fn) {
 		const transaction = db.transaction(storeName, transactionType)
 		const store = transaction.objectStore(storeName)
 
-		const promises = fn(store)
+		const requests = fn(store)
 
-		const resultsPromise = Array.isArray(promises)
-			? Promise.all(promises)
-			: promises
+		const resultsPromise = Array.isArray(requests)
+			? Promise.all(requests.map(promisifyRequest))
+			: promisifyRequest(requests)
 
 		transaction.onerror = () => reject(transaction.error)
 		transaction.oncomplete = () => resolve(resultsPromise)
@@ -74,7 +77,14 @@ function runQueriesInTransaction({ db, storeName, transactionType }, fn) {
 function promisifyRequest(request) {
 	const deferred = defer()
 
-	request.onerror = () => deferred.reject(request.error)
+	request.onerror = err => {
+		// prevent global error throw https://bugzilla.mozilla.org/show_bug.cgi?id=872873
+		if (typeof err.preventDefault === `function`) {
+			err.preventDefault()
+		}
+		deferred.reject(request.error)
+	}
+
 	request.onsuccess = () => deferred.resolve(request.result)
 
 	return deferred.promise

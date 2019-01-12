@@ -2,27 +2,28 @@
   "name": "small-indexeddb",
   "version": "0.0.0",
   "description": "Transactional key/value interactions with IndexedDB",
-  "main": "index.js",
+  "main": "bundle.js",
   "scripts": {
-    "test": "rollup -c | tape-run"
+    "build": "rollup -c",
+    "test": "npm run build && rollup -c test.rollup.config.js | tape-run"
   },
   "keywords": [
     "indexeddb",
     "indexedb",
     "idb",
     "browser",
-    "transaction"
+    "transaction",
+    "promise"
   ],
   "author": "TehShrike",
   "license": "WTFPL",
   "devDependencies": {
+    "p-defer": "^1.0.0",
     "rollup": "^1.1.0",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-node-resolve": "^4.0.0",
     "tape-run": "^5.0.0",
     "zora": "^2.0.1"
   },
-  "dependencies": {
-    "p-defer": "^1.0.0"
-  }
+  "dependencies": {}
 }

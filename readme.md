@@ -22,6 +22,10 @@ This library uses ES2015 language features.  If you want to use it in older brow
 
 # API
 
+```js
+import smallIndexedDb from 'small-indexeddb'
+```
+
 ## `storePromise = smallIndexedDb(databaseName)`
 
 Returns a promise that resolves to a store in the given database.  The store will be created if it does not exist yet.
@@ -74,10 +78,26 @@ store.delete([ 'key1', 'key2' ])
 
 Wipe the store.
 
-# In the future maybe
+## `promise = store.transaction(mode, synchronousCallbackFn)`
 
-- interact with schema versions?
-- support running different kinds of queries in the same transaction?
+[`mode` must be either `'readonly'`, `'readwrite'` or `'readwriteflush'`.](https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/transaction#Parameters)
+
+`synchronousCallbackFn` will be called immediately with a single [`IDBObjectStore`](https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore) parameter.
+
+Your function must return either an [`IDBRequest`](https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest) or an array of IDBRequests.
+
+The returned promise will return the result of the single IDBRequest, or an array containing the results of all the requests you returned.
+
+```js
+store.transaction(`readwrite`, idbStore => idbStore.put(`totally a`, `a`)).then(() => {
+	return store.transaction(`readonly`, idbStore => [
+		idbStore.get(`a`),
+		idbStore.get(`b`),
+	]).then(([ a, b ]) => {
+		console.log(a, b)
+	})
+})
+```
 
 # License
 

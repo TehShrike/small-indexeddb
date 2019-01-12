@@ -1,5 +1,5 @@
 const test = require(`zora`)
-const smallIndexedDb = require(`./index.js`)
+const smallIndexedDb = require(`./bundle.js`)
 
 test(`Read empty key`, t => smallIndexedDb(`dummyDb`, `dummyStore`).then(store =>
 	store.read([ `wat` ]).then(results => {
@@ -85,4 +85,18 @@ test(`Different dbs don't affect each other`, async t => {
 	const [ value ] = await store1.read([ `key1` ])
 
 	t.equal(value, `valuez`)
+})
+
+test(`transaction method`, async t => {
+	const store = await smallIndexedDb(`someStore5`)
+
+	await store.transaction(`readwrite`, idbStore => idbStore.put(`totally a`, `a`))
+
+	const [ a, b ] = await store.transaction(`readonly`, idbStore => [
+		idbStore.get(`a`),
+		idbStore.get(`b`),
+	])
+
+	t.equal(a, `totally a`)
+	t.equal(b, undefined)
 })
