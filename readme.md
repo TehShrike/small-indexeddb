@@ -84,9 +84,9 @@ Wipe the store.
 
 `synchronousCallbackFn` will be called immediately with a single [`IDBObjectStore`](https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore) parameter.
 
-Your function must return either an [`IDBRequest`](https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest) or an array of IDBRequests.
+Your function must return either an [`IDBRequest`](https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest) or an array of `IDBRequests`.
 
-The returned promise will return the result of the single IDBRequest, or an array containing the results of all the requests you returned.
+The returned promise will return the result of the single `IDBRequest`, or an array containing the results of all the requests you returned.
 
 ```js
 store.transaction(`readwrite`, idbStore => idbStore.put(`totally a`, `a`)).then(() => {
