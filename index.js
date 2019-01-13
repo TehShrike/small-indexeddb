@@ -2,7 +2,7 @@ import defer from 'p-defer'
 
 const version = 1
 
-export default function getDatabaseStore(databaseName) {
+export default function getTransactionFunction(databaseName) {
 	const storeName = databaseName
 
 	return new Promise((resolve, reject) => {
@@ -16,12 +16,12 @@ export default function getDatabaseStore(databaseName) {
 		openRequest.onsuccess = () => {
 			const db = openRequest.result
 
-			resolve((transactionType, fn) => runQueriesInTransaction({ db, storeName, transactionType }, fn))
+			resolve((transactionType, fn) => runQueriesInTransaction({ db, storeName, transactionType, fn }))
 		}
 	})
 }
 
-function runQueriesInTransaction({ db, storeName, transactionType }, fn) {
+function runQueriesInTransaction({ db, storeName, transactionType, fn }) {
 	return new Promise((resolve, reject) => {
 		const transaction = db.transaction(storeName, transactionType)
 		const store = transaction.objectStore(storeName)

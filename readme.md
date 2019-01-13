@@ -24,78 +24,33 @@ import smallIndexedDb from 'small-indexeddb'
 
 ## `promise = smallIndexedDb(databaseName)`
 
-Returns a promise that resolves to a transaction-running function for the given database.  The store will be created if it does not exist yet.
+Returns a promise that resolves to a `transaction` function for the given database.  The store will be created if it does not exist yet.
 
 Under the hood, the store name will be the same as the database name.
 
-```js
-smallIndexedDb('myCoolDb').then(runTransaction => {
-	runTransaction(db => {
-
-	})
-	store.write({ key: 'aww', value: 'yeah' })
-})
-```
-
-## `valuesPromise = store.read(keysArray)`
-
-Returns a promise that resolves to an array of values matching the given array of key strings.
-
-```js
-store.read([ 'a', 'b', 'c' ]).then(results => {
-	results // => [ 1, 2, 3 ]
-})
-```
-
-Keys without a corresponding value in the database will be `undefined`.
-
-## `promise = store.write(keyValueArray)`
-
-Write a collection of key/value pairs to the store in a single transaction.
-
-The key/value pairs can either be expressed as an object (`{ key: 'keyWat', value: { lol: 'whee' } }`) or an array (`[ 'keyWat', { lol: 'whee' } ]`)
-
-
-```js
-store.write([
-	[ 'a', 1 ],
-	{ key: 'b', value: 2 }
-]).catch(err => {
-	console.error('Oh no, something went wrong!', err)
-})
-```
-
-## `promise = store.delete(keysArray)`
-
-Delete any number of keys from the store.
-
-```js
-store.delete([ 'key1', 'key2' ])
-```
-
-## `promise = store.clear()`
-
-Wipe the store.
-
-## `promise = store.transaction(mode, synchronousCallbackFn)`
+## `promise = transaction(mode, callbackFunction)`
 
 [`mode` must be either `'readonly'`, `'readwrite'` or `'readwriteflush'`.](https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/transaction#Parameters)
 
-`synchronousCallbackFn` will be called immediately with a single [`IDBObjectStore`](https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore) parameter.
+`callbackFunction` will be called immediately with a single [`IDBObjectStore`](https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore) parameter.
 
-Your function must return either an [`IDBRequest`](https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest) or an array of `IDBRequests`.
+Your callback function must return either an [`IDBRequest`](https://developer.mozilla.org/en-US/docs/Web/API/IDBRequest) or an array of `IDBRequests`.
 
 The returned promise will return the result of the single `IDBRequest`, or an array containing the results of all the requests you returned.
 
 ```js
-store.transaction(`readwrite`, idbStore => idbStore.put(`totally a`, `a`)).then(() => {
-	return store.transaction(`readonly`, idbStore => [
+async function main() {
+	const transaction = await smallIndexedDb('sweetness')
+
+	await transaction(`readwrite`, idbStore => idbStore.put(`totally a`, `a`))
+
+	const [ a, b ] = await transaction(`readonly`, idbStore => [
 		idbStore.get(`a`),
 		idbStore.get(`b`),
-	]).then(([ a, b ]) => {
-		console.log(a, b)
-	})
-})
+	])
+
+	console.log(a, b)
+}
 ```
 
 # License
