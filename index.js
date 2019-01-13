@@ -8,9 +8,7 @@ export default function getTransactionFunction(databaseName) {
 	return new Promise((resolve, reject) => {
 		const openRequest = window.indexedDB.open(databaseName, version)
 
-		openRequest.onupgradeneeded = () => {
-			openRequest.result.createObjectStore(storeName)
-		}
+		openRequest.onupgradeneeded = () => openRequest.result.createObjectStore(storeName)
 		openRequest.onblocked = () => reject(new Error(`onblocked`))
 		openRequest.onerror = () => reject(openRequest.error)
 		openRequest.onsuccess = () => {

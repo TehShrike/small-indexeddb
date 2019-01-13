@@ -7,6 +7,20 @@ test(`Read empty key`, async t => {
 	t.equal(result, undefined)
 })
 
+test('Queries are run synchronously', async t => {
+	const transaction = await smallIndexedDb(`dummyDb2`)
+	let fired = false
+
+	const resultPromise = transaction('readonly', store => {
+		fired = true
+		return store.get(`wat`)
+	})
+
+	t.equal(fired, true)
+
+	return resultPromise
+})
+
 test(`Write values, then read them back`, async t => {
 	const transaction = await smallIndexedDb(`someStore1`)
 
@@ -49,8 +63,8 @@ test(`Write and read an array`, async t => {
 })
 
 test(`Different dbs don't affect each other`, async t => {
-	const transaction1 = await smallIndexedDb(`store1`)
-	const transaction2 = await smallIndexedDb(`store2`)
+	const transaction1 = await smallIndexedDb(`db1`)
+	const transaction2 = await smallIndexedDb(`db2`)
 
 	await transaction1('readwrite', store => store.put('valuez', 'key1'))
 	await transaction2('readwrite', store => store.put('VALUUUEEEEE', 'key1'))

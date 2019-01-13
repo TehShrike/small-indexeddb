@@ -1,11 +1,10 @@
 # Goals
 
-- support key/value operations in bulk
+- simplify [`IDBObjectStore`](https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore) interactions
 - promise-based API, avoiding events
-- expose multi-query transactions in a way that is easy to interact with and reason about
+- expose low-friction multi-query transactions
 - small, like [idb-keyval](https://github.com/jakearchibald/idb-keyval) and [nanodb](https://github.com/lrlna/nanoidb)
-- not large, like [localForage](https://github.com/localForage/localForage/blob/master/src/localforage.js) or [Dexie](https://github.com/dfahlander/Dexie.js/blob/master/src/Dexie.js) or [JsStore](https://github.com/ujjwalguptaofficial/JsStore/blob/master/Code/JsStore/JsStoreInstance.ts)
-- not tiny - no code golfing here, maintainability first
+- not large like [localForage](https://github.com/localForage/localForage/blob/master/src/localforage.js) or [Dexie](https://github.com/dfahlander/Dexie.js/blob/master/src/Dexie.js) or [JsStore](https://github.com/ujjwalguptaofficial/JsStore/blob/master/Code/JsStore/JsStoreInstance.ts)
 - tests
 
 # IndexedDB model
@@ -14,7 +13,7 @@
 - Databases contain object stores, identified by a string name
 - Object stores can have transactions applied to them with any number of read/write/delete actions
 
-This library exposes the above ideas in a somewhat different way than the browser does, but I believe the concepts hold.
+For now, this library ignores some IndexedDB features (version numbers, multiple object stores per database) for simplicity's sake.
 
 # API
 
