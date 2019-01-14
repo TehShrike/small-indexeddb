@@ -1,6 +1,6 @@
 {
   "name": "small-indexeddb",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Simple IndexedDB transactions with Promises",
   "main": "bundle.js",
   "scripts": {
