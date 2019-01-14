@@ -1,7 +1,7 @@
 {
   "name": "small-indexeddb",
   "version": "1.0.0",
-  "description": "Transactional key/value interactions with IndexedDB",
+  "description": "Simple IndexedDB transactions with Promises",
   "main": "bundle.js",
   "scripts": {
     "build": "rollup -c",
