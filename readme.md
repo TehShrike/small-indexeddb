@@ -4,7 +4,7 @@
 - promise-based API, avoiding events
 - expose low-friction multi-query transactions
 - small, like [idb-keyval](https://github.com/jakearchibald/idb-keyval) and [nanodb](https://github.com/lrlna/nanoidb)
-- not large like [localForage](https://github.com/localForage/localForage/blob/master/src/localforage.js) or [Dexie](https://github.com/dfahlander/Dexie.js/blob/master/src/Dexie.js) or [JsStore](https://github.com/ujjwalguptaofficial/JsStore/blob/master/Code/JsStore/JsStoreInstance.ts)
+- not large like [localForage](https://unpkg.com/localforage) or [Dexie](https://unpkg.com/dexie) or [JsStore](https://unpkg.com/jsstore)
 - tests
 
 # IndexedDB model
